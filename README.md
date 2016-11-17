@@ -6,25 +6,25 @@
 
 List keyboards:
 
-  python -m inv list
+    python -m inv list
 
 Add a keyboard:
 
-  python -m inv add <form_factor> <make> <model> <serial>
+    python -m inv add <form_factor> <make> <model> <serial>
 
 Show a specific keyboard:
 
-  python -m inv show <serial>
+    python -m inv show <serial>
 
 ## Motivation
 
 > Why on earth would you need a system to manage keyboard inventory?
-> - Every Sane Person
+> -- Every Sane Person
 
 Some people collect stamps; other people collect coins. I collect keyboards. Once you get over ~3 keyboards (I'm a bit past that) you need something to track all of them.
 
 > Why not use Excel like a normal person?
-> - Same group as before
+> -- Same group as before
 
 First, I think we've established that I'm not a normal person. Second, I like to program and Excel is boring. Third, why not? "It seemed like a good idea at the time."
 
@@ -34,7 +34,7 @@ First, I think we've established that I'm not a normal person. Second, I like to
 
 Install requirements with:
 
-  pip install -r requirements.txt
+    pip install -r requirements.txt
 
 ## License
 
