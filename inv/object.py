@@ -178,9 +178,6 @@ class Keyboard(Object):
 
     @classmethod
     def fields(cls):
-        """
-        See Object.fields().
-        """
         return {
             "form_factor": cls.enum_field(
                 "form_factor",
@@ -200,6 +197,9 @@ class Keyboard(Object):
 
     @property
     def keycaps(self):
+        """
+        Gets associated keycap set for keyboard or None if none exists
+        """
         return KeycapSet.get_one(keyboard_serial=self.serial)
 
 
@@ -218,9 +218,6 @@ class KeycapSet(Object):
 
     @classmethod
     def fields(cls):
-        """
-        See Object.fields().
-        """
         return {
             "name": "TEXT",
             "profile": cls.enum_field(
