@@ -55,6 +55,17 @@ class Object(object):
             values[name] = getattr(self, name, None)
         return values
 
+    @classmethod
+    def enum_field(cls, name, field_type, choices):
+        """
+        Builds the SQLite string for an enum field
+        """
+        return "{} CHECK({} IN ({}))".format(
+            field_type,
+            name,
+            ",".join(["'{}'".format(c) for c in choices])
+        )
+
     def save(self):
         """
         Saves the object into the database.
@@ -99,8 +110,12 @@ class Object(object):
         if constraints:
             sql += " WHERE"
             for key, value in constraints.items():
-                sql += " `{}` = ?".format(key)
-                values.append(value)
+                sql += " `{}` ".format(key)
+                if value is None:
+                    sql += "IS NULL"
+                else:
+                    sql += "= ?"
+                    values.append(value)
 
         LOG.debug("[SELECT] " + sql)
 
@@ -153,11 +168,17 @@ class Keyboard(Object):
         return {
             "make": "TEXT",
             "model": "TEXT",
-            "form_factor": "TEXT CHECK(form_factor IN ({}))".format(
-                ",".join(["'{}'".format(f) for f in cls.FORM_FACTORS])
+            "form_factor": cls.enum_field(
+                "form_factor",
+                "TEXT",
+                cls.FORM_FACTORS,
             ),
             "serial": "TEXT PRIMARY KEY",
         }
+
+    @property
+    def keycaps(self):
+        return KeycapSet.get_one(keyboard_serial=self.serial)
 
 
 class KeycapSet(Object):
@@ -167,13 +188,23 @@ class KeycapSet(Object):
 
     TABLE = "keycaps"
 
+    PROFILES = [
+        "sa",
+        "dsa",
+        "cherry",
+    ]
+
     @classmethod
     def fields(cls):
         """
         See Object.fields().
         """
         return {
-            "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
             "name": "TEXT",
+            "profile": cls.enum_field(
+                "profile",
+                "TEXT",
+                cls.PROFILES,
+            ),
             "keyboard_serial": "TEXT",
         }

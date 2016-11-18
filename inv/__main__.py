@@ -63,7 +63,7 @@ def parse_args():
 
     add_parser = subparsers.add_parser(
         "add",
-        help="Add new item to inventory",
+        help="Add new keyboard to inventory",
     )
     for field in sorted(Keyboard.fields()):
         add_parser.add_argument(
@@ -71,6 +71,25 @@ def parse_args():
             help=field + " of keyboard",
         )
     add_parser.set_defaults(function=cmd_add)
+
+    add_keycaps_parser = subparsers.add_parser(
+        "add-caps",
+        help="Add new keycap set to inventory",
+    )
+    add_keycaps_parser.add_argument(
+        "name",
+        help="Name of keycap set",
+    )
+    add_keycaps_parser.add_argument(
+        "profile",
+        choices=KeycapSet.PROFILES,
+        help="Profile of keycap set",
+    )
+    add_keycaps_parser.add_argument(
+        "--keyboard-serial",
+        help="Serial of keyboard keycaps are on",
+    )
+    add_keycaps_parser.set_defaults(function=cmd_add_keycaps)
 
     return parser.parse_args()
 
@@ -99,7 +118,7 @@ def cmd_show(args):
 
 def cmd_list(args):
     """
-    Shows all keyboards.
+    Shows all keyboards and keycaps.
     """
     headers = sorted(Keyboard.fields().keys())
 
@@ -111,13 +130,33 @@ def cmd_list(args):
 
     rows = []
     for keyboard in Keyboard.get(**filters):
-        rows.append([getattr(keyboard, h) for h in headers])
+        row = [getattr(keyboard, h) for h in headers]
+
+        caps = keyboard.keycaps
+        row.append(caps.name if caps else "-")
+
+        rows.append(row)
 
     if not rows:
-        print('No keyboards, yet')
+        print("No keyboards, yet")
+    else:
+        print("Keyboards")
+        print(tabulate(rows, headers=headers + ["keycaps"]))
+
+    rows = []
+    for caps in KeycapSet.get(keyboard_serial=None):
+        rows.append([
+            caps.name,
+            caps.profile,
+        ])
+
+    if not rows:
+        print("No keycap sets, yet")
         return True
 
-    print(tabulate(rows, headers=headers))
+    print("Keycap Sets")
+    print(tabulate(rows, headers=["name", "profile"]))
+
     return True
 
 
@@ -128,6 +167,17 @@ def cmd_add(args):
     values = {f: getattr(args, f) for f in sorted(Keyboard.fields())}
 
     Keyboard(**values).save()
+
+    return True
+
+
+def cmd_add_keycaps(args):
+    """
+    Adds a new keycap set to the database.
+    """
+    values = {f: getattr(args, f) for f in sorted(KeycapSet.fields())}
+
+    KeycapSet(**values).save()
 
     return True
 
