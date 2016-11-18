@@ -44,6 +44,22 @@ class Object(object):
         """
         raise NotImplementedError()
 
+    @classmethod
+    def required_fields(cls):
+        """
+        Returns a list of required fields of an object.
+
+        Must be implemented by children.
+        """
+        raise NotImplementedError()
+
+    @classmethod
+    def optional_fields(cls):
+        """
+        Returns a list of optional fields of an object.
+        """
+        return list(set(cls.fields()) - set(cls.required_fields()))
+
     @property
     def field_values(self):
         """
@@ -166,15 +182,21 @@ class Keyboard(Object):
         See Object.fields().
         """
         return {
-            "make": "TEXT",
-            "model": "TEXT",
             "form_factor": cls.enum_field(
                 "form_factor",
                 "TEXT",
                 cls.FORM_FACTORS,
             ),
+            "make": "TEXT",
+            "model": "TEXT",
+            "notes": "TEXT",
+            "picture": "TEXT",
             "serial": "TEXT PRIMARY KEY",
         }
+
+    @classmethod
+    def required_fields(cls):
+        return ["make", "model", "form_factor", "serial"]
 
     @property
     def keycaps(self):
@@ -208,3 +230,7 @@ class KeycapSet(Object):
             ),
             "keyboard_serial": "TEXT",
         }
+
+    @classmethod
+    def required_fields(cls):
+        return ["name", "profile"]

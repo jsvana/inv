@@ -65,9 +65,14 @@ def parse_args():
         "add",
         help="Add new keyboard to inventory",
     )
-    for field in sorted(Keyboard.fields()):
+    for field in sorted(Keyboard.required_fields()):
         add_parser.add_argument(
             field,
+            help=field + " of keyboard",
+        )
+    for field in sorted(Keyboard.optional_fields()):
+        add_parser.add_argument(
+            "--" + field.replace("_", "-"),
             help=field + " of keyboard",
         )
     add_parser.set_defaults(function=cmd_add)
@@ -76,19 +81,16 @@ def parse_args():
         "add-caps",
         help="Add new keycap set to inventory",
     )
-    add_keycaps_parser.add_argument(
-        "name",
-        help="Name of keycap set",
-    )
-    add_keycaps_parser.add_argument(
-        "profile",
-        choices=KeycapSet.PROFILES,
-        help="Profile of keycap set",
-    )
-    add_keycaps_parser.add_argument(
-        "--keyboard-serial",
-        help="Serial of keyboard keycaps are on",
-    )
+    for field in sorted(KeycapSet.required_fields()):
+        add_keycaps_parser.add_argument(
+            field,
+            help=field + " of keycap set",
+        )
+    for field in sorted(KeycapSet.optional_fields()):
+        add_keycaps_parser.add_argument(
+            "--" + field.replace("_", "-"),
+            help=field + " of keycap set",
+        )
     add_keycaps_parser.set_defaults(function=cmd_add_keycaps)
 
     return parser.parse_args()
@@ -192,6 +194,9 @@ def main():
         LOG.setLevel("DEBUG")
 
     init_db()
+
+    print(Keyboard.required_fields())
+    print(Keyboard.optional_fields())
 
     func = getattr(args, "function", None)
     if not func:
