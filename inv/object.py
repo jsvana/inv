@@ -24,9 +24,6 @@ class Object(object):
     # Name of object's table
     TABLE = ""
 
-    # Name of primary key field
-    ID_FIELD = ""
-
     def __init__(self, *args, **kwargs):
         # Assume field values are presented in the same order as values
         if args:
@@ -81,11 +78,7 @@ class Object(object):
         sql = "CREATE TABLE IF NOT EXISTS `{}` ({})".format(
             cls.TABLE,
             ",".join([
-                "`{}` {}{}".format(
-                    k,
-                    v,
-                    " PRIMARY KEY" if k == cls.ID_FIELD else "",
-                ) for k, v in cls.fields().items()
+                "`{}` {}".format(k, v) for k, v in cls.fields().items()
             ]),
         )
         LOG.debug("[CREATE] " + sql)
@@ -144,7 +137,6 @@ class Keyboard(Object):
     """
 
     TABLE = "keyboards"
-    ID_FIELD = "serial"
 
     FORM_FACTORS = [
         "full",
@@ -164,5 +156,24 @@ class Keyboard(Object):
             "form_factor": "TEXT CHECK(form_factor IN ({}))".format(
                 ",".join(["'{}'".format(f) for f in cls.FORM_FACTORS])
             ),
-            "serial": "TEXT",
+            "serial": "TEXT PRIMARY KEY",
+        }
+
+
+class KeycapSet(Object):
+    """
+    Represents a keycap set in the database.
+    """
+
+    TABLE = "keycaps"
+
+    @classmethod
+    def fields(cls):
+        """
+        See Object.fields().
+        """
+        return {
+            "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+            "name": "TEXT",
+            "keyboard_serial": "TEXT",
         }

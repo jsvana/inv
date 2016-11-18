@@ -11,7 +11,10 @@ import sys
 from tabulate import tabulate
 
 
-from .object import Keyboard
+from .object import (
+    Keyboard,
+    KeycapSet,
+)
 
 
 LOG = logging.getLogger()
@@ -77,6 +80,7 @@ def init_db():
     Ensures database tables are created properly.
     """
     Keyboard.create_table()
+    KeycapSet.create_table()
 
 
 def cmd_show(args):
