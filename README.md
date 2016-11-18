@@ -4,7 +4,7 @@
 
 ## Usage
 
-List keyboards:
+List keyboards and keycap sets:
 
     python -m inv list
 
@@ -15,6 +15,14 @@ Add a keyboard:
 Show a specific keyboard:
 
     python -m inv show <serial>
+
+Add a keycap set:
+
+    python -m inv add-caps <name> <profile>
+
+Add a keycap set on a keyboard:
+
+    python -m inv add-caps <name> <profile> --keyboard-serial <serial>
 
 ## Motivation
 
